@@ -1,12 +1,29 @@
 #!/usr/bin/env node
 var SlackBot = require('slackbots');
+var request = require('request');
+var url = 'http://reddit.com/r/pixiv/.json';
+var channel = 'testingggg';
 
 // create a bot
 var bot = new SlackBot({
-    token: process.env.SLACK_TOKEN, // Add a bot https://my.slack.com/services/new/bot and put the token
+    token: process.env.SLACK_TOKEN,
     name: 'makibot'
 });
 
 bot.on('start', function() {
-  console.log("TEST");
+  var params = {
+    as_user: true
+  };
+  request(url, function(err, res, body){
+    if (!err && res.statusCode == 200) {
+      var importedJSON = JSON.parse(body);
+      var imageURL = importedJSON.data.children[0].data.url;
+      bot.postMessageToChannel(channel, imageURL, params).fail(function(err){
+         console.log(err);
+      });
+    }
+    else {
+      bot.postMessageToChannel(channel, 'I\'m having problems!', params);
+    }
+  });
 });
