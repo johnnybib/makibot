@@ -18,11 +18,13 @@ bot.on('start', function() {
     if (!err && res.statusCode == 200) {
       var importedJSON = JSON.parse(body);
       var imageURL = importedJSON.data.children[0].data.url;
+      console.log("POSTING...")
       bot.postMessageToChannel(channel, imageURL, params).fail(function(err){
          console.log(err);
       });
     }
     else {
+      console.log("ERROR READING JSON");
       bot.postMessageToChannel(channel, 'I\'m having problems!', params);
     }
   });
