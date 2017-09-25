@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 var SlackBot = require('slackbots');
 var request = require('request');
+var fs = require('fs');
+var file = 'bin/lastImage.txt';
 var url = 'http://reddit.com/r/pixiv/.json';
 var channel = 'anime-pics';
 
@@ -17,11 +19,22 @@ bot.on('start', function() {
   request(url, function(err, res, body){
     if (!err && res.statusCode == 200) {
       var importedJSON = JSON.parse(body);
-      var imageURL = importedJSON.data.children[0].data.url;
-      console.log("POSTING...")
-      bot.postMessageToChannel(channel, imageURL, params).fail(function(err){
-         console.log(err);
+      fs.readFile(file, 'utf8', function(err, data){
+        if ( err ){ throw err;}
+        var imageURL = importedJSON.data.children[0].data.url;
+        if(imageURL == data)
+        {
+          imageURL = importedJSON.data.children[1].data.url;
+        }
+        fs.writeFile(file, imageURL, {'encoding':'utf8'}, function(err){
+          if ( err ) { throw err; }
+            console.log("POSTING...")
+            bot.postMessageToChannel(channel, imageURL, params).fail(function(err){
+               console.log(err);
+            });
+        });
       });
+
     }
     else {
       console.log("ERROR READING JSON");
