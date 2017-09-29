@@ -3,7 +3,7 @@ var SlackBot = require('slackbots');
 var request = require('request');
 var fs = require('fs');
 var file = 'bin/alreadyPosted.txt';
-var url = 'http://reddit.com/r/pixiv/.json';
+var url = process.env.SITE_URL;
 var channel = 'anime-pics';
 
 // create a bot
