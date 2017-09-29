@@ -23,17 +23,18 @@ bot.on('start', function() {
         if ( err ){ throw err;}
         var imageURL = importedJSON.data.children[0].data.url;
         var i = 1;
+        console.log(data);
         while(data.indexOf(imageURL) != -1)
         {
           imageURL = importedJSON.data.children[i].data.url;
           i++;
         }
-        fs.appendFile(file, imageURL, {'encoding':'utf8'}, function(err){
+        fs.appendFile(file, '\n' + imageURL, {'encoding':'utf8'}, function(err){
           if ( err ) { throw err; }
             console.log("POSTING...")
-            bot.postMessageToChannel(channel, imageURL, params).fail(function(err){
-               console.log(err);
-            });
+            // bot.postMessageToChannel(channel, imageURL, params).fail(function(err){
+            //    console.log(err);
+            // });
         });
       });
 
