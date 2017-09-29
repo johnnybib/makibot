@@ -32,9 +32,9 @@ bot.on('start', function() {
         fs.appendFile(file, '\n' + imageURL, {'encoding':'utf8'}, function(err){
           if ( err ) { throw err; }
             console.log("POSTING...")
-            // bot.postMessageToChannel(channel, imageURL, params).fail(function(err){
-            //    console.log(err);
-            // });
+            bot.postMessageToChannel(channel, imageURL, params).fail(function(err){
+               console.log(err);
+            });
         });
       });
 
