@@ -44,8 +44,9 @@ bot.on('start', function() {
           return;
         }
         else{
-          findURL(client, imageURL, importedJSON, params, 1);
-          process.exit();
+          findURL(client, imageURL, importedJSON, params, 1, function(){
+            process.exit();
+          });
         }
       });
     }
@@ -57,7 +58,7 @@ bot.on('start', function() {
   });
 });
 
-function findURL(client, imageURL, importedJSON, params, i){
+function findURL(client, imageURL, importedJSON, params, i, callback){
   var queryString = 'SELECT * FROM urls WHERE url = \'' + imageURL + '\'';
   client.query(queryString, function(err, result){
     if(result.rows.length == 0){
@@ -67,12 +68,13 @@ function findURL(client, imageURL, importedJSON, params, i){
       bot.postMessageToChannel(channel, imageURL, params).fail(function(err){
          console.log(err);
       });
+      callback && callback();
       return;
     }
     else{
       imageURL = importedJSON.data.children[i].data.url;
       i++;
-      return findURL(client, imageURL, importedJSON, params, i);
+      return findURL(client, imageURL, importedJSON, params, i, callback);
     }
   });
 }
