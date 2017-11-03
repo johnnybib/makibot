@@ -45,6 +45,7 @@ bot.on('start', function() {
         }
         else{
           findURL(client, imageURL, importedJSON, params, 1);
+          process.exit();
         }
       });
     }
@@ -66,7 +67,6 @@ function findURL(client, imageURL, importedJSON, params, i){
       bot.postMessageToChannel(channel, imageURL, params).fail(function(err){
          console.log(err);
       });
-      process.exit();
       return;
     }
     else{
