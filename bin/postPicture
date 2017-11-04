@@ -44,10 +44,7 @@ bot.on('start', function() {
           return;
         }
         else{
-          findURL(client, imageURL, importedJSON, params, 1, function(){
-            console.log("test");
-            process.exit();
-          });
+          findURL(client, imageURL, importedJSON, params, 1);
         }
       });
     }
@@ -59,17 +56,18 @@ bot.on('start', function() {
   });
 });
 
-function findURL(client, imageURL, importedJSON, params, i, callback){
+function findURL(client, imageURL, importedJSON, params, i){
   var queryString = 'SELECT * FROM urls WHERE url = \'' + imageURL + '\'';
   client.query(queryString, function(err, result){
     if(result.rows.length == 0){
       queryString = 'INSERT INTO urls (url) VALUES (\'' + imageURL + '\')';
       client.query(queryString);
       console.log("POSTING...")
-      bot.postMessageToChannel(channel, imageURL, params).fail(function(err){
+      bot.postMessageToChannel(channel, imageURL, params, function(){
+        process.exit();
+      }).fail(function(err){
          console.log(err);
       });
-      callback && callback();
       return;
     }
     else{
