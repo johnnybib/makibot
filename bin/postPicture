@@ -73,7 +73,7 @@ function findURL(client, imageURL, importedJSON, params, i){
     else{
       imageURL = importedJSON.data.children[i].data.url;
       i++;
-      return findURL(client, imageURL, importedJSON, params, i, callback);
+      return findURL(client, imageURL, importedJSON, params, i);
     }
   });
 }
