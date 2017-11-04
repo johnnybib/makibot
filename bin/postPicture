@@ -45,6 +45,7 @@ bot.on('start', function() {
         }
         else{
           findURL(client, imageURL, importedJSON, params, 1, function(){
+            console.log("test");
             process.exit();
           });
         }
