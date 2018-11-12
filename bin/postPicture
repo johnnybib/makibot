@@ -7,8 +7,8 @@ var url = require("url");
 var pg = require("pg");
 var path = require("path");
 
-var siteUrl = "https://reddit.com" || process.env.SITE_URL;
-var subreddit = "/r/awwnime" || process.env.SUBREDDIT;
+var siteUrl = process.env.SITE_URL || "https://reddit.com";
+var subreddit = process.env.SUBREDDIT || "/r/awwnime";
 var json = "/.json";
 var channel = "anime-pics";
 
