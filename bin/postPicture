@@ -1,76 +1,77 @@
 #!/usr/bin/env node
-"use strict"
+"use strict";
 
-var SlackBot = require('slackbots');
-var request = require('request');
-var url = require('url');
-var pg = require('pg');
-var path = require('path');
+var SlackBot = require("slackbots");
+var request = require("request");
+var url = require("url");
+var pg = require("pg");
+var path = require("path");
 
-var siteUrl = process.env.SITE_URL;
-var channel = 'anime-pics';
+var siteUrl = "https://reddit.com" || process.env.SITE_URL;
+var subreddit = "/r/awwnime" || process.env.SUBREDDIT;
+var json = "/.json";
+var channel = "anime-pics";
 
 const pgParams = url.parse(process.env.DATABASE_URL);
-const pgAuth = pgParams.auth.split(':');
+const pgAuth = pgParams.auth.split(":");
 const config = {
   user: pgAuth[0],
   password: pgAuth[1],
   host: pgParams.hostname,
   port: pgParams.port,
-  database: pgParams.pathname.split('/')[1],
+  database: pgParams.pathname.split("/")[1],
   ssl: true
 };
 
 var pool = new pg.Pool(config);
-
 // create a bot
 var bot = new SlackBot({
-    token: process.env.SLACK_TOKEN,
-    name: 'makibot'
+  token: process.env.SLACK_TOKEN,
+  name: "makibot"
 });
 
-bot.on('start', function() {
+bot.on("start", function() {
   var params = {
     as_user: true
   };
-  request(siteUrl, function(err, res, body){
+  request(siteUrl + subreddit + json, function(err, res, body) {
     if (!err && res.statusCode == 200) {
       var importedJSON = JSON.parse(body);
       var imageURL = importedJSON.data.children[0].data.url;
-      pool.connect(function(err, client){
-        if(err){
+      pool.connect(function(err, client) {
+        if (err) {
           console.log(err);
           process.exit();
           return;
-        }
-        else{
+        } else {
           findURL(client, imageURL, importedJSON, params, 1);
         }
       });
-    }
-    else {
+    } else {
       console.log("ERROR READING JSON");
-      bot.postMessageToChannel(channel, 'I\'m having problems!', params);
+      bot.postMessageToChannel(channel, "I'm having problems!", params);
       process.exit();
     }
   });
 });
 
-function findURL(client, imageURL, importedJSON, params, i){
-  var queryString = 'SELECT * FROM urls WHERE url = \'' + imageURL + '\'';
-  client.query(queryString, function(err, result){
-    if(result.rows.length == 0){
-      queryString = 'INSERT INTO urls (url) VALUES (\'' + imageURL + '\')';
+function findURL(client, imageURL, importedJSON, params, i) {
+  var queryString = "SELECT * FROM urls WHERE url = '" + imageURL + "'";
+  client.query(queryString, function(err, result) {
+    if (result.rows.length == 0 && !imageURL.includes(subreddit)) {
+      queryString = "INSERT INTO urls (url) VALUES ('" + imageURL + "')";
       client.query(queryString);
-      console.log("POSTING...")
-      bot.postMessageToChannel(channel, imageURL, params, function(){
-        process.exit();
-      }).fail(function(err){
-         console.log(err);
-      });
+      console.log("POSTING...");
+      console.log(imageURL);
+      bot
+        .postMessageToChannel(channel, imageURL, params, function() {
+          process.exit();
+        })
+        .fail(function(err) {
+          console.log(err);
+        });
       return;
-    }
-    else{
+    } else {
       imageURL = importedJSON.data.children[i].data.url;
       i++;
       return findURL(client, imageURL, importedJSON, params, i);
